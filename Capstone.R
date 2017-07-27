@@ -10,7 +10,6 @@
 rm(list=ls())
 # --- --- --- 
 
-
 library(NLP) 
 library(openNLP) 
 library(openNLPmodels.en) 
@@ -36,18 +35,6 @@ twit <- readLines(tcon)
 
 combined <- rbind(blog, news, twit)
 
-#Quiz Question ********** |||
-library(stringi)
-max(stri_length(blog))
-max(stri_length(twit))
-max(stri_length(news))
-
-#Quiz Question ********** |||
-biostats = grep('biostats', twit)
-twit[biostats]
-
-#Quiz Question 6 ******* |||
-twit[grep('A computer once beat me at chess, but it was no match for me at kickboxing',twit)]
 
 #samp <- as.String(samp)
 # -------------------------------------------------------------------- #
@@ -56,11 +43,22 @@ twit[grep('A computer once beat me at chess, but it was no match for me at kickb
 
 # fxs <- c(stripWhitespace, tolower, removePunctuation)
 # corp <- for(i in 1:length(fxs)){sapply(corp, function(x) tm_map(x,fxs[i]))}
-
+#
+#
+# ___________________________________________________________________
+# ___________________________________________________________________
+# --- Run functions on text sample data
 
 bcorp <- mkCorpus(blog)
+
+#Annotate
 blog.annotation <- annotateText(bcorp) 
+
+#Get word tags from annotation
 blog.word.tags <- getWordTags(blog.annotation, bcorp)
+
+#NGram tokenization
+blog.grams <- ngramTokenize(bcorp,3,7)
 
 #Summarize words and POS
 blog.word.counts <- blog.word.tags %>%
@@ -70,9 +68,13 @@ blog.word.counts <- blog.word.tags %>%
 blog.pos.counts <- blog.word.tags %>%
     group_by(POS) %>%
     summarise(count = n())
+# ___________________________________________________________________
+# Dip Trip
+# Flip Fantasia
+# ___________________________________________________________________
 
 
-#--! Define function for summarizing
+
 # -------------------------------------------------------------------- #
 # ---- Create Term Document Matrix ----------------------------------- #
 # -------------------------------------------------------------------- #

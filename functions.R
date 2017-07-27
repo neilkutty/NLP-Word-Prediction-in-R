@@ -42,8 +42,8 @@ getWordTags <- function(annotation, corpus){
 
 # Perform ngram tokenization and return dataframe with counts of phrases
 # returns: dataframe
-ngramTokenize <- function(corpus){
-   ngram <- NGramTokenizer(corpus$content, Weka_control(min=2,max=3))
+ngramTokenize <- function(corpus,min,max){
+   ngram <- NGramTokenizer(corpus$content, Weka_control(min=min,max=max))
    ngdf <- data.frame(phrase = ngram) %>%
        group_by(phrase) %>%
        summarise(count = n())

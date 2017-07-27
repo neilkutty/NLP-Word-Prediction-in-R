@@ -26,9 +26,25 @@ twit <- readLines(tcon, 100)
 #samp <- as.String(samp)
 corp <- NULL
 
+#Quiz Question ********** |||
+library(stringi)
+max(stri_length(blog))
+max(stri_length(twit))
+max(stri_length(news))
+
+#Quiz Question ********** |||
+biostats = grep('biostats', twit)
+twit[biostats]
+
+#Quiz Question 6 ******* |||
+twit[grep('A computer once beat me at chess, but it was no match for me at kickboxing',twit)]
+
+
+
 
 #----------------------------------------------------------------------------------------#
-
+# ~~~~~~~~ !!!!!!!!!!!!!!! PREDICTION EXAMPLE !!!!!!!!!!!! ~~~~~~~~~~~~
+#----------------------------------------------------------------------------------------#
 
 f <- function(queryHistoryTab, query, n = 2) {
     require(tau)
