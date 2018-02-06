@@ -28,9 +28,9 @@ library(ggplot2)
 library(doParallel)
 library(grid)
 library(gridExtra)
-source('functions.R')
+source('NextWordPrediction/functions.R')
 
-options( java.parameters = "-Xmx5g" )
+options( java.parameters = "-Xmx1024m" )
 registerDoParallel(makeCluster(detectCores()-1))
 
 bcon = file("final/en_US/en_US.blogs.txt")
@@ -54,7 +54,7 @@ text_df = c(blog, news, twit)
 # tsamp = sample(twit, 50000)
 
 # Get sample from the full text_df
-fullsamp = sample(text_df, 100000)
+fullsamp = sample(text_df, 50000)
 
 # Create corpus out of the text data sample
 fullcorp = mkCorpus(fullsamp)
@@ -112,12 +112,12 @@ sevengram = ngramTokenize(fullcorp,7,7)
 
 # N-gram data without separation of words in string
 saveRDS(unigram, file="unigram.RDS")
-saveRDS(bigram_sep, file="bigram.RDS")
-saveRDS(trigram_sep, file="trigram.RDS")
-saveRDS(quadgram_sep, file="quadgram.RDS")
-saveRDS(pentagram_sep, file="pentagram.RDS")
-# saveRDS(sixgram, file="sixgram.RDS")
-# saveRDS(sevengram, file="sevengram.RDS")
+saveRDS(bigram, file="bigram.RDS")
+saveRDS(trigram, file="trigram.RDS")
+saveRDS(quadgram, file="quadgram.RDS")
+saveRDS(pentagram, file="pentagram.RDS")
+saveRDS(sixgram, file="sixgram.RDS")
+saveRDS(sevengram, file="sevengram.RDS")
 
 unigram = readRDS(file="unigram.RDS")
 bigram = readRDS(file="bigram.RDS")
@@ -138,7 +138,172 @@ predict_Backoff(testString, ngramlist)
 x = "I have no idea how"
 predict_Backoff(x,ngramlist)
 # <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
+
+# <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
+# successful test of method to get tail of long input (> 3 words/grams)
+longTest = 'why is it that how are you'
+inputlen = length(unlist(strsplit(as.character(longTest), " ")))
+
+testTail = unlist(strsplit(as.character(longTest),' '))
+testTain = testTail[(length(testTail)-1):length(testTail)]
+testTain = paste(testTain, collapse = ' ')
+#Trying to match tail to parts of prediction
+longPred = quadgram[grep(testTain,quadgram$word)[1:5],1]()
+longPred = unlist(strsplit(as.character(longPred[1]), " "))
+longPred[length(longPred)]
 # <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>>
+
+# New predict Text function:
+predict1 = function(testString){
+    # j = NULL
+    # inputNew = NULL
+    # nextWord = NULL
+    
+    inputlen = length(unlist(strsplit(as.character(testString), " ")))
+    
+    if (inputlen > 3) {
+        inputNew = unlist(strsplit(as.character(testString), " "))
+        inputNew = inputNew[(length(inputNew)-2):length(inputNew)]
+        inputNew = paste(inputNew, collapse = " ")
+        j = quadgram[grep(inputNew,quadgram$word)[1:5],1]
+        j = unlist(strsplit(as.character(j[1])," "))
+        nextWord = j[length(j)]
+        if (is.na(nextWord)){
+            inputNew = unlist(strsplit(as.character(testString), " "))
+            inputNew = inputNew[(length(inputNew)-1):length(inputNew)]
+            inputNew = paste(inputNew, collapse = " ")
+            j = trigram[grep(inputNew, trigram$word)[1:5], 1]
+            j = unlist(strsplit(as.character(j[1])," "))
+            nextWord = j[length(j)]
+            if (is.na(nextWord)){
+                inputNew = unlist(strsplit(as.character(testString), " "))
+                inputNew = inputNew[length(inputNew)]
+                inputNew = paste(inputNew, collapse = " ")
+                j = bigram[grep(inputNew, bigram$word)[1:5], 1]
+                j = unlist(strsplit(as.character(j[1])," "))
+                nextWord = j[length(j)]
+                if(is.na(nextWord)){
+                    nextWord = unigram$word[1]
+                }
+                
+            }
+            
+            
+        }
+    }
+    else if (inputlen == 3) {
+        inputNew = unlist(strsplit(as.character(testString), " "))
+        inputNew = paste(inputNew, collapse = " ")
+        j = quadgram[grep(inputNew,quadgram$word)[1:5],1]
+        j = unlist(strsplit(as.character(j[1])," "))
+        nextWord = j[length(j)]
+        if (is.na(nextWord)){
+            inputNew = unlist(strsplit(as.character(testString), " "))
+            inputNew = inputNew[(length(inputNew)-1):length(inputNew)]
+            inputNew = paste(inputNew, collapse = " ")
+            j = trigram[grep(inputNew, trigram$word)[1:5], 1]
+            j = unlist(strsplit(as.character(j[1])," "))
+            nextWord = j[length(j)]
+            if (is.na(nextWord)){
+                inputNew = unlist(strsplit(as.character(testString), " "))
+                inputNew = inputNew[length(inputNew)]
+                inputNew = paste(inputNew, collapse = " ")
+                j = bigram[grep(inputNew, bigram$word)[1:5], 1]
+                j = unlist(strsplit(as.character(j[1])," "))
+                nextWord = j[length(j)]
+                if(is.na(nextWord)){
+                    nextWord = unigram$word[1]
+                }
+            }
+        }
+    }
+    else if (inputlen == 2) {
+        inputNew = unlist(strsplit(as.character(testString), " "))
+        inputNew = paste(inputNew, collapse = " ")
+        j = trigram[grep(inputNew,trigram$word)[1:5],1]
+        j = unlist(strsplit(as.character(j[1])," "))
+        nextWord = j[length(j)]
+        if (is.na(nextWord)){
+            inputNew = unlist(strsplit(as.character(testString), " "))
+            inputNew = inputNew[length(inputNew)]
+            inputNew = paste(inputNew, collapse = " ")
+            j = bigram[grep(inputNew, bigram$word)[1:5], 1]
+            j = unlist(strsplit(as.character(j[1])," "))
+            nextWord = j[length(j)]
+            if(is.na(nextWord)){
+                nextWord = unigram$word[1]
+            }
+        }
+    }
+    
+    else if (inputlen == 1) {
+        inputNew = unlist(strsplit(as.character(testString), " "))
+        inputNew = paste(inputNew, collapse = " ")
+        j = bigram[grep(inputNew,bigram$word)[1:5],1]
+        j = unlist(strsplit(as.character(j[1])," "))
+        nextWord = j[length(j)]
+        if(is.na(nextWord)){
+            nextWord = unigram$word[1]
+        }
+    }
+    else {
+        nextWord = 'Please enter text to predict next word...'
+    }
+    return(nextWord)
+}
+
+predict1("sup good wid it on it to it how is it")
+predict1("who dun diddit wid it on it")
+# <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
+# <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>>
+# Here's where the error lies... the trailing whitespace triggers the search using
+# grep to find the proper word; however, no whitespace at end of input means the search is off
+
+#  ^ Above is resolved ..
+
+#  initial test of predict logic ... 
+
+#   Test  Test  Test    Test     Test      Test       Test
+# <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
+gotoTG = trigram[grep('^(go to)', trigram$word),1][1]
+
+v = 'go to'
+gotoTG = trigram[grep(paste0('^(',v,')', collapse=''), trigram$word),1][1]
+k = unlist(strsplit(as.character(gotoTG)," "))
+k[length(k)]
+
+v = 'i i'
+iiBG = bigram[grep(paste0('^(',v,')', collapse=''), bigram$word),1]
+# <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
+
+predictNext('go to',2)
+
+
+# <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>>
+# More testing of the added > 4 gram augmentation
+#   Test  Test  Test    Test     Test      Test       Test
+# <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
+text = 'every time i try to'
+text = clean_fx(text)
+#text_len = length(input$inputText)
+text_len = length(unlist(strsplit(as.character(text)," ")))
+debug(predictNext)
+predictNext(text, text_len)
+
+
+quadgram[grep('time i try to', quadgram$word),1]
+
+j = quadgram[grep(paste0('^(',text,')'), quadgram$word),1][1]
+# <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
+
+# <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
+
+# <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
+
+
+# <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
+#   Predict text - first
+
 # <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
 # <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>>
 # <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
@@ -150,11 +315,9 @@ k = quadgram[grep(inputNew,quadgram$word)[1:5],1]
 
 splitj = unlist(strsplit(as.character(j[1]), " "))
 nextj = splitj[length(splitj)]
-#--------------------------------------------------------------------------------------------
 
-
-
-
+# <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>>
+# <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
 # <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
 # successful test of method to get tail of long input (> 3 words/grams)
 longTest = 'why is it that how are you'
@@ -215,6 +378,7 @@ return(nextWord)
 
 predictText(longTest)
 predictText('all of the why is it')
+predictText('it has')
 # <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
 # <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>>
 # <><><><><><><>>><>><><><>>><><><><><><><>>><><><><><><>>>><<<<>>><><><><><<<>>><<<>>><<<>>>
