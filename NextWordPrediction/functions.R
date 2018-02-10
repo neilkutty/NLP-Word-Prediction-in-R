@@ -6,7 +6,7 @@ library(plyr)
 library(ANLP)
 library(NLP) 
 library(openNLP) 
-library(openNLPmodels.en) 
+#library(openNLPmodels.en) 
 library(tm) 
 library(stringi)
 library(stringr) 
@@ -54,7 +54,7 @@ clean_fx = function(text_char){
         #gsub(pattern = "[[:digit:]]", replacement = "") %>%
         #gsub(pattern = "[[:punct:]]", replacement = "") %>%
         gsub(pattern = "(RT|via|rt)((?:\\b\\W*@\\w+)+)", replacement = "") %>%
-        gsub(pattern = "( rt | rt| rts )", replacement = "")
+        gsub(pattern = "( rt | rt| rts )", replacement = "") 
     return(clean_char)
 }
 
@@ -74,7 +74,8 @@ mkCorpus <- function(chr){
         tm_map(content_transformer(bracketX)) %>%
         tm_map(tolower) %>%
         tm_map(removePunctuation) %>%
-        tm_map(stripWhitespace)
+        tm_map(stripWhitespace) %>%
+        tm_map(removeWords, profanity)
     return(corp)}
 
 #Function to create annotation object 

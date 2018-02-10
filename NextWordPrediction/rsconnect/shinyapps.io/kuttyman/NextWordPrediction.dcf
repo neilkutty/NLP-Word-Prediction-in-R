@@ -1,0 +1,12 @@
+name: NextWordPrediction
+title: NextWordPrediction
+username:
+account: kuttyman
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 276225
+bundleId: 1216114
+url: https://kuttyman.shinyapps.io/NextWordPrediction/
+when: 1518226298.88445
+asMultiple: FALSE
+asStatic: FALSE

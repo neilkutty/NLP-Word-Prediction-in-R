@@ -1,3 +1,16 @@
+#  Prediction function for Shiny app
+#   author: Neil Kutty
+#   
+#  
+#
+
+
+
+# load(file = 'unigram.Rdata')
+# load(file = 'bigram.Rdata')
+# load(file = 'trigram.Rdata')
+# load(file = 'quadgram.Rdata')
+# load(file = 'pentagram.Rdata')
 unigram = readRDS(file="unigram.RDS")
 bigram = readRDS(file="bigram.RDS")
 trigram = readRDS(file="trigram.RDS")
@@ -65,18 +78,25 @@ predictNext = function(testString, testLength){
             nextWord = j[length(j)]
             if (is.na(nextWord)){
                 inputNew = unlist(strsplit(as.character(testString), " "))
-                inputNew = inputNew[length(inputNew)]
+                inputNew = inputNew[(length(inputNew)-2):length(inputNew)]
                 inputNew = paste(inputNew, collapse = " ")
-                j = bigram[grep(paste0('^(',inputNew,')'), bigram$word),1][1]
+                j = trigram[grep(paste0('^(',inputNew,')'), trigram$word),1][1]
                 j = unlist(strsplit(as.character(j)," "))
                 nextWord = j[length(j)]
-                if(is.na(nextWord)){
-                    nextWord = unigram$word[sample(6,1)]
+                if (is.na(nextWord)){
+                    inputNew = unlist(strsplit(as.character(testString), " "))
+                    inputNew = inputNew[length(inputNew)]
+                    inputNew = paste(inputNew, collapse = " ")
+                    j = bigram[grep(paste0('^(',inputNew,')'), bigram$word),1][1]
+                    j = unlist(strsplit(as.character(j)," "))
+                    nextWord = j[length(j)]
+                    if(is.na(nextWord)){
+                        nextWord = unigram$word[sample(6,1)]
 
                 }
 
             }
-
+        }
 
         }
     }
@@ -133,7 +153,7 @@ predictNext = function(testString, testLength){
         }
     }
     else {
-        nextWord = 'Please enter text to predict next word...'
+        nextWord = 'App is ready! Please enter text in the box, and the next predicted word will appear here...'
     }
     return(nextWord)
 }

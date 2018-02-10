@@ -1,29 +1,48 @@
-#
-# This is the user-interface definition of a Shiny web application. You can
-# run the application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
+# Next Word Prediction 
+# author: Neil Kutty
 # 
-#    http://shiny.rstudio.com/
-##
-## SEE X5 Example!
 ##
 
 library(shiny)
 library(shinythemes)
+library(shinycssloaders)
 # Define UI for application that draws a histogram
-shinyUI(fluidPage(theme = shinytheme("cerulean"),
+shinyUI(fluidPage(theme = shinytheme("superhero"),
   
-  # Application title
-  titlePanel("Next Word Prediction"),
-  
-    mainPanel(
+  titlePanel( title = (h3("Next Word Prediction", align = "center")),
+              windowTitle = "Next Word Prediction"),
+ 
+#h4('...App is ready when words appear below text input box...'),
+  br(),
+  h4('This shiny app predicts the most likely next word a user wants to type based on what they have already typed.'),
         
-        textInput("inputText",
-                  "Enter Text:",
-                  value=""),
+  sidebarLayout( 
+      sidebarPanel(textInput("inputText",
+                  "Enter Text here and Predicted Word will appear below:",
+                  value="")),
         
-        textOutput("showText")
+        
+        
+        mainPanel(
+            br(),
+            h4(
+                #withSpinner(
+                textOutput("showText")
+                #,type = getOption("spinner.type", default = 4),
+                #size = getOption("spinner.size", default = 0.8)
+                #)
+               ),
+            width=9
+            )
+),
+
+br(),
+br(),
+br(),
+br(),
+hr(),
+h6('author: Neil Kutty'),
+h6(a("Github", href = "https://github.com/sampsonsimpson/NLP-Word-Prediction-in-R/tree/master/NextWordPrediction")) )
     )
-  ))
+  
 

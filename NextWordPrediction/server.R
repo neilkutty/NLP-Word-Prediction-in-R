@@ -1,3 +1,8 @@
+# 
+# Next Word Prediction 
+# author: Neil Kutty
+#
+#
 #
 #  01/31/2018 - expand predictNext function to include five-gram search
 #             - add a clean_fx that doesn't return a corpus 
