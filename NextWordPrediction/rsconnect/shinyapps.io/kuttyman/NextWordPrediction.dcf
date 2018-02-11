@@ -5,8 +5,8 @@ account: kuttyman
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 276225
-bundleId: 1216749
+bundleId: 1217084
 url: https://kuttyman.shinyapps.io/NextWordPrediction/
-when: 1518292516.86065
+when: 1518310859.86566
 asMultiple: FALSE
 asStatic: FALSE

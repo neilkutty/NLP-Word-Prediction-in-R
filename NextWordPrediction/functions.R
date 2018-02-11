@@ -32,8 +32,9 @@ library(doParallel)
 cleanInput_fx = function(text_char){
     clean_char = text_char %>%
         iconv('latin1', 'ASCII', sub = "'") %>%
-        replace_contraction() %>%
-        replace_abbreviation() %>%
+#        replace_contraction() %>%
+#        replace_abbreviation() %>%
+        tolower() %>%
         gsub(pattern = "http.*", replacement= "") %>%
         gsub(pattern = "@\\w+", replacement= "") %>%
         gsub(pattern = "by.*", replacement = "") %>%
@@ -49,8 +50,8 @@ cleanInput_fx = function(text_char){
 clean_fx = function(text_char){
     clean_char = text_char %>%
         iconv('latin1', 'ASCII', sub = "'") %>%
-        replace_contraction() %>%
-        replace_abbreviation() %>%
+#        replace_contraction() %>%
+#        replace_abbreviation() %>%
         gsub(pattern = "http.*", replacement= "") %>%
         gsub(pattern = "@\\w+", replacement= "") %>%
         gsub(pattern = "by.*", replacement = "") %>%
@@ -73,8 +74,8 @@ mkCorpus <- function(chr){
     corp <- Corpus(VectorSource(clean_chr))
     corp <- corp %>%
         tm_map(removeNumbers) %>%
-        # tm_map(content_transformer(replace_contraction)) %>%
-        # tm_map(content_transformer(replace_abbreviation)) %>%
+        tm_map(content_transformer(replace_contraction)) %>%
+        tm_map(content_transformer(replace_abbreviation)) %>%
         tm_map(content_transformer(bracketX)) %>%
         tm_map(tolower) %>%
         tm_map(removePunctuation) %>%
